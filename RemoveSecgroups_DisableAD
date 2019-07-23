@@ -1,0 +1,12 @@
+# Import the Active Directory module if not already loaded
+if (-not (Get-Module ActiveDirectory)){
+    Import-Module ActiveDirectory -ErrorAction Stop
+}
+$user = Read-Host => [ Enter UserName ]
+Write-host
+Write-host ... $user is member of these AD Groups -fore Yellow
+Get-ADPrincipalGroupMembership -Identity  $user | Format-Table -Property name
+Write-host ...Removing the Group Membership -fore DarkYellow
+$ADGroups = Get-ADPrincipalGroupMembership -Identity  $user | where {$_.Name -ne “Domain Users”}
+Remove-ADPrincipalGroupMembership -Identity  $user -MemberOf $ADGroups -Confirm:$false -verbose
+Disable-ADAccount -Identity $user
